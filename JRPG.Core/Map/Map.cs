@@ -1,9 +1,8 @@
-using System.Xml;
 using JRPG.Core.Map.Views;
 
 namespace JRPG.Core.Map;
 
-public class Map
+internal class Map : IAdjacentCellsView
 {
     private Cell[,] cells;
 
@@ -65,5 +64,31 @@ public class Map
         }
 
         return new CellViewForInteraction(cell.OccupantId, cell.Surface.Id);
+    }
+
+    public IEnumerable<Coordinates> GetAdjacentCells(Coordinates pos)
+    {
+        var deltas = new (int dx, int dy)[]
+        {
+            (0, -1),
+            (0, 1),
+            (-1, 0),
+            (1, 0),
+        };
+
+        foreach (var (dx, dy) in deltas)
+        {
+            var neighbors = new Coordinates(pos.X + dx, pos.Y + dy);
+            
+            if (IsInside(neighbors))
+            {
+                yield return neighbors;
+            }
+
+            else
+            {
+                yield return pos;
+            }
+        }
     }
 }
